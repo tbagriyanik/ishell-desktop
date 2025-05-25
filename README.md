@@ -2,6 +2,10 @@
 
 ## Project info
 
+
+Test Address:
+**URL**: https://ishell-desktop.lovable.app
+
 **URL**: https://lovable.dev/projects/0fa63717-8be6-4dcd-941e-a78977986652
 
 ## How can I edit this code?
