@@ -31,7 +31,7 @@ const Desktop: React.FC = () => {
         // Implement icon arrangement logic
         break;
       case 'refresh':
-        window.location.reload();
+        dispatch({ type: 'REFRESH' });
         break;
     }
     setContextMenu(null);
@@ -40,32 +40,27 @@ const Desktop: React.FC = () => {
   return (
     <div
       ref={desktopRef}
-      className="min-h-screen relative overflow-hidden"
-      style={{ backgroundColor: state.theme.background }}
+      className="min-h-screen relative overflow-hidden pt-16"
+      style={{ 
+        backgroundColor: state.theme.desktopBackground,
+        fontFamily: state.theme.font 
+      }}
       onContextMenu={handleContextMenu}
       onClick={handleClick}
     >
-      {/* Desktop Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800" />
+      {/* Desktop Background Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-800/20 via-slate-900/20 to-slate-800/20" />
       
       {/* App Icons */}
       <div className="relative z-10 p-8">
         <div className="grid grid-cols-6 gap-6 max-w-screen-xl">
           {state.apps.map((app) => (
-            <AppIcon
-              key={app.id}
-              app={app}
-              onContextMenu={(e, appId) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setContextMenu({ x: e.clientX, y: e.clientY });
-              }}
-            />
+            <AppIcon key={app.id} app={app} />
           ))}
         </div>
       </div>
 
-      {/* Taskbar */}
+      {/* Taskbar at top */}
       <Taskbar />
 
       {/* Context Menu */}

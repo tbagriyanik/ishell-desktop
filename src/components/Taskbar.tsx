@@ -4,7 +4,7 @@ import { useShell } from '../contexts/ShellContext';
 import SearchBar from './SearchBar';
 
 const Taskbar: React.FC = () => {
-  const { state, t } = useShell();
+  const { state, dispatch, t } = useShell();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -33,9 +33,15 @@ const Taskbar: React.FC = () => {
     return date.toLocaleDateString(state.language === 'tr' ? 'tr-TR' : 'en-US');
   };
 
+  const openWindows = Object.values(state.windows).filter(window => window.isOpen);
+
+  const handleWindowClick = (windowId: string) => {
+    dispatch({ type: 'BRING_TO_FRONT', payload: windowId });
+  };
+
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 h-16 backdrop-blur-md bg-white/10 border-t border-white/20 flex items-center justify-between px-6 z-50"
+      className="fixed top-0 left-0 right-0 h-16 backdrop-blur-md bg-white/10 border-b border-white/20 flex items-center justify-between px-6 z-50"
       style={{ fontFamily: state.theme.font }}
     >
       {/* Left side - Search */}
@@ -44,20 +50,23 @@ const Taskbar: React.FC = () => {
       </div>
 
       {/* Center - Active Windows */}
-      <div className="flex space-x-2">
-        {Object.values(state.windows)
-          .filter(window => window.isOpen)
-          .map(window => (
+      <div className="flex space-x-2 max-w-2xl overflow-x-auto">
+        {openWindows.map(window => {
+          const app = state.apps.find(a => a.id === window.id);
+          const title = app?.name || window.id;
+          const icon = app?.icon || '📱';
+          
+          return (
             <div
               key={window.id}
-              className="w-12 h-8 bg-white/20 rounded-lg flex items-center justify-center cursor-pointer hover:bg-white/30 transition-colors"
-              onClick={() => {
-                // Bring window to front
-              }}
+              className="flex items-center px-3 py-2 bg-white/20 rounded-lg cursor-pointer hover:bg-white/30 transition-colors min-w-0 max-w-32"
+              onClick={() => handleWindowClick(window.id)}
             >
-              <div className="w-2 h-2 bg-white rounded-full" />
+              <span className="text-lg mr-2 flex-shrink-0">{icon}</span>
+              <span className="text-white text-sm truncate">{title}</span>
             </div>
-          ))}
+          );
+        })}
       </div>
 
       {/* Right side - Clock */}

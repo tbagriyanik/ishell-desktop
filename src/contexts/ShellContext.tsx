@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 
 interface AppData {
@@ -23,12 +22,14 @@ interface ShellState {
   theme: {
     primary: string;
     background: string;
+    desktopBackground: string;
     font: string;
   };
   language: 'en' | 'tr';
   timeFormat: '12' | '24';
   showSeconds: boolean;
   showDate: boolean;
+  iconSize: 'small' | 'medium' | 'large';
   apps: AppData[];
   windows: { [key: string]: WindowState };
   nextZIndex: number;
@@ -45,12 +46,14 @@ const initialState: ShellState = {
   theme: {
     primary: '#3b82f6',
     background: '#1e293b',
+    desktopBackground: '#1e293b',
     font: 'system-ui'
   },
   language: 'en',
   timeFormat: '24',
   showSeconds: true,
   showDate: true,
+  iconSize: 'medium',
   apps: [
     {
       id: 'settings',
@@ -81,7 +84,9 @@ const translations = {
     'add_app': 'Add App',
     'theme_color': 'Theme Color',
     'background_color': 'Background Color',
+    'desktop_background': 'Desktop Background',
     'font': 'Font',
+    'icon_size': 'Icon Size',
     'language': 'Language',
     'time_format': 'Time Format',
     'show_seconds': 'Show Seconds',
@@ -96,7 +101,10 @@ const translations = {
     'arrange_icons': 'Arrange Icons',
     'refresh': 'Refresh',
     'no_results': 'No results found',
-    'get_started': 'Get Started'
+    'get_started': 'Get Started',
+    'small': 'Small',
+    'medium': 'Medium',
+    'large': 'Large'
   },
   tr: {
     'welcome': 'iShell\'e Hoş Geldiniz',
@@ -104,7 +112,9 @@ const translations = {
     'add_app': 'Uygulama Ekle',
     'theme_color': 'Tema Rengi',
     'background_color': 'Arkaplan Rengi',
+    'desktop_background': 'Masaüstü Arkaplanı',
     'font': 'Yazı Tipi',
+    'icon_size': 'Simge Boyutu',
     'language': 'Dil',
     'time_format': 'Saat Formatı',
     'show_seconds': 'Saniye Göster',
@@ -119,7 +129,10 @@ const translations = {
     'arrange_icons': 'Simgeleri Diz',
     'refresh': 'Yenile',
     'no_results': 'Sonuç bulunamadı',
-    'get_started': 'Başlayın'
+    'get_started': 'Başlayın',
+    'small': 'Küçük',
+    'medium': 'Orta',
+    'large': 'Büyük'
   }
 };
 
@@ -135,6 +148,8 @@ const shellReducer = (state: ShellState, action: any): ShellState => {
       return { ...state, showSeconds: action.payload };
     case 'SET_SHOW_DATE':
       return { ...state, showDate: action.payload };
+    case 'SET_ICON_SIZE':
+      return { ...state, iconSize: action.payload };
     case 'ADD_APP':
       return { ...state, apps: [...state.apps, action.payload] };
     case 'UPDATE_APP':
@@ -203,6 +218,9 @@ const shellReducer = (state: ShellState, action: any): ShellState => {
       return { ...state, searchQuery: action.payload };
     case 'LOAD_STATE':
       return { ...state, ...action.payload };
+    case 'REFRESH':
+      window.location.reload();
+      return state;
     default:
       return state;
   }
@@ -234,10 +252,11 @@ export const ShellProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       timeFormat: state.timeFormat,
       showSeconds: state.showSeconds,
       showDate: state.showDate,
+      iconSize: state.iconSize,
       apps: state.apps.filter(app => !['settings', 'add-app'].includes(app.id))
     };
     localStorage.setItem('ishell_state', JSON.stringify(stateToSave));
-  }, [state.theme, state.language, state.timeFormat, state.showSeconds, state.showDate, state.apps]);
+  }, [state.theme, state.language, state.timeFormat, state.showSeconds, state.showDate, state.iconSize, state.apps]);
 
   const t = (key: string): string => {
     return translations[state.language][key] || key;
