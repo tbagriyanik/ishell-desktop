@@ -1,13 +1,39 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState, useEffect } from 'react';
+import Desktop from '../components/Desktop';
+import WelcomeScreen from '../components/WelcomeScreen';
+import WindowManager from '../components/WindowManager';
+import { ShellProvider } from '../contexts/ShellContext';
 
 const Index = () => {
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  useEffect(() => {
+    // Check if user has visited before
+    const hasVisited = localStorage.getItem('ishell_visited');
+    if (hasVisited) {
+      setShowWelcome(false);
+    }
+  }, []);
+
+  const handleWelcomeComplete = () => {
+    localStorage.setItem('ishell_visited', 'true');
+    setShowWelcome(false);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <ShellProvider>
+      <div className="min-h-screen overflow-hidden">
+        {showWelcome ? (
+          <WelcomeScreen onComplete={handleWelcomeComplete} />
+        ) : (
+          <>
+            <Desktop />
+            <WindowManager />
+          </>
+        )}
       </div>
-    </div>
+    </ShellProvider>
   );
 };
 
